@@ -16,6 +16,7 @@
     "actions": "Which built-in and custom actions to render, in order. Accepts an array or a comma/space separated string. Built-ins: `play`, `progress` (renders the seek bar inline and switches to a single row), `time`, `volume` and `-` (a spacer). Any other name renders the slot of the same name.",
     "actionsClass": "Classes applied to the actions row.",
     "progressClass": "Classes applied to the progress wrapper.",
+    "playProps": "Props passed to the default play button, e.g. `color`, `variant` or `size`.",
     "seekable": "Allows seeking. When off the seek bar stays focusable but read-only."
   },
   "events": {

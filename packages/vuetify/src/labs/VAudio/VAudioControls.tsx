@@ -89,6 +89,7 @@ export const makeVAudioControlsProps = propsFactory({
   },
   actionsClass: null as unknown as PropType<ClassValue>,
   progressClass: null as unknown as PropType<ClassValue>,
+  playProps: Object as PropType<VIconBtn['$props']>,
   hideTime: Boolean,
   seekable: {
     type: Boolean,
@@ -298,7 +299,8 @@ export const VAudioControls = genericComponent<VAudioControlsSlots>()({
       )
 
       const playProps: Record<string, unknown> = {
-        class: 'v-audio__action-play',
+        ...props.playProps,
+        class: ['v-audio__action-play', props.playProps?.class],
         icon: playing.value ? props.pauseIcon : props.playIcon,
         'aria-label': playing.value ? labels.value.pause : labels.value.play,
         onClick: togglePlay,

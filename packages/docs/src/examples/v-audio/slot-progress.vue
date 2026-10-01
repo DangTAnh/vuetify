@@ -3,15 +3,12 @@
     <v-audio
       :src="src"
       actions="prev play next progress rate restart"
+      :play-props="{ color: 'primary', size: 36, variant: 'flat' }"
       actions-class="ga-1"
       class="py-3 px-2 border"
     >
       <template v-slot:prev>
         <v-icon-btn aria-label="Previous" icon="mdi-skip-previous"></v-icon-btn>
-      </template>
-
-      <template v-slot:play="{ props }">
-        <v-icon-btn v-bind="props" color="primary" size="36" variant="flat"></v-icon-btn>
       </template>
 
       <template v-slot:next>

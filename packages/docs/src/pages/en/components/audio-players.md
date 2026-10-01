@@ -93,7 +93,7 @@ The waveform never downloads the file itself. To decode in the browser, pass the
 
 #### Custom actions
 
-Each custom action name in **actions** becomes a slot that receives the player state and methods: `playing`, `progress`, `currentTime`, `duration`, `play`, `pause`, `skipTo`, `skipBy`, `setPlaybackRate` and more. The **play** slot also receives `props` for the built-in button, so `v-bind="props"` keeps the icon and label in sync. Buttons rendered in slots follow `VAudioControls` defaults, and **actions-class** and **progress-class** style the rows.
+Each custom action name in **actions** becomes a slot that receives the player state and methods: `playing`, `progress`, `currentTime`, `duration`, `play`, `pause`, `skipTo`, `skipBy`, `setPlaybackRate` and more. The **play** slot also receives `props` for the built-in button, so `v-bind="props"` keeps the icon and label in sync. To only restyle the built-in button, pass **play-props** instead. Buttons rendered in slots follow `VAudioControls` defaults, and **actions-class** and **progress-class** style the rows.
 
 <ExamplesExample file="v-audio/slot-actions" />
 
