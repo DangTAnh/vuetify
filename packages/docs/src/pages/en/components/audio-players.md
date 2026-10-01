@@ -77,9 +77,13 @@ Without `progress` in the list, the seek bar gets its own row above the actions,
 
 #### Waveform
 
-`v-audio-waveform` replaces the seek bar through the **progress** slot. Its `props` fit both `v-seek-bar` and `v-audio-waveform`, so `v-bind="props"` wires position, duration and seeking. Pass **peaks**, an array of amplitudes between 0 and 1, one per bar. Compute them where the file is produced and store them alongside it. Without **peaks** the waveform decodes the file in the browser; **lazy** waits for the first play.
+`v-audio-waveform` replaces the seek bar through the **progress** slot. Its `props` fit both `v-seek-bar` and `v-audio-waveform`, so `v-bind="props"` wires position, duration and seeking. Pass **peaks**, an array of amplitudes between 0 and 1, one per bar. Compute them where the file is produced and store them alongside it.
 
 <ExamplesExample file="v-audio/prop-waveform" />
+
+The waveform never downloads the file itself. To decode in the browser, pass the file as a `Blob` to **peaks-source**: a `File` picked in `v-file-input`, or the result of your own `fetch`.
+
+<ExamplesExample file="v-audio/prop-peaks-source" />
 
 #### Readonly and start position
 

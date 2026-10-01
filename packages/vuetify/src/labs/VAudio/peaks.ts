@@ -51,19 +51,15 @@ function isSliceable (head: Uint8Array) {
     (head[0] === 0xFF && (head[1] & 0xE0) === 0xE0)
 }
 
-export async function decodePeaks (src: string, options: {
+export async function decodePeaks (source: Blob, options: {
   buckets: number
   strategy?: SampleStrategy
-  credentials?: RequestCredentials
   duration?: number
   signal?: AbortSignal
   onProgress?: (peaks: number[]) => void
 }): Promise<number[] | undefined> {
   const { buckets, strategy = 'peak', duration = 0 } = options
-  const res = await fetch(src, { credentials: options.credentials, signal: options.signal })
-  if (!res.ok || !res.body) throw new Error(`${res.status} ${res.statusText}`)
-
-  const reader = res.body.getReader()
+  const reader = source.stream().getReader()
   const audioContext = new OfflineAudioContext(1, 1, 44100)
   const total = duration * WINDOWS_PER_SECOND
   const sums = new Float64Array(Math.min(buckets, Math.max(1, Math.floor(total))))
@@ -113,6 +109,7 @@ export async function decodePeaks (src: string, options: {
 
   while (true) {
     const { done, value } = await reader.read()
+    options.signal?.throwIfAborted()
     if (done) break
 
     sliceable ??= isSliceable(value)

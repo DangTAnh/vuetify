@@ -39,6 +39,7 @@ const LIVE_INTERVAL = 66
 
 export const makeVAudioWaveformProps = propsFactory({
   peaks: Array as PropType<readonly number[]>,
+  peaksSource: Blob,
   bars: [Number, String],
   barWidth: {
     type: [Number, String],
@@ -62,7 +63,6 @@ export const makeVAudioWaveformProps = propsFactory({
   },
   mirror: [Boolean, Number, String],
   live: Boolean,
-  lazy: Boolean,
 
   ...makeVSeekBarProps({ height: 32 }),
 }, 'VAudioWaveform')
@@ -114,41 +114,34 @@ export const VAudioWaveform = genericComponent<VAudioWaveformSlots>()({
 
     let decodeAbort: AbortController | undefined
 
-    function resetDecode () {
+    watch(() => props.max > 0 && !props.live && !props.peaks?.length && props.peaksSource, source => {
       decodeAbort?.abort()
-      decodeAbort = undefined
       decoded.value = undefined
-      history.value = []
-    }
+      if (!IN_BROWSER || !source) return
 
-    // ponytail: the <audio> element downloads the file a second time; this leans on the HTTP
-    // cache. Feeding the fetched bytes back as a blob URL would avoid it for uncacheable media.
-    function decode () {
-      const el = audio?.media.value
-      if (!IN_BROWSER || decodeAbort || props.live || props.peaks?.length || !el?.currentSrc) return
-
-      decodeAbort = new AbortController()
-      const src = el.currentSrc
-      decodePeaks(src, {
+      const controller = decodeAbort = new AbortController()
+      decodePeaks(source, {
         buckets: 1024,
         strategy: props.sampleStrategy,
-        credentials: el.crossOrigin === 'use-credentials' ? 'include' : 'same-origin',
         duration: props.max,
-        signal: decodeAbort.signal,
+        signal: controller.signal,
         onProgress: peaks => {
           decoded.value = peaks
         },
       }).then(
         peaks => {
           if (peaks) decoded.value = peaks
-          else consoleWarn(`VAudioWaveform: "${src}" not decoded. Only MP3 and AAC decode at any length, other formats need a known duration up to 30 minutes. Pass precomputed peaks instead.`)
+          else consoleWarn('VAudioWaveform: peaks-source not decoded. Formats other than MP3 and AAC decode only up to 30 minutes.')
         },
-        () => {},
+        error => {
+          if (!controller.signal.aborted) consoleWarn(`VAudioWaveform: peaks-source not decoded. ${error}`)
+        },
       )
-    }
+    }, { immediate: true })
 
-    watch(() => props.max, max => !max && resetDecode())
-    watch(() => props.max > 0 && (!props.lazy || !!audio?.playing.value), ready => ready && decode(), { immediate: true })
+    watch(() => props.max, max => {
+      if (!max) history.value = []
+    })
 
     function connectAnalyser () {
       const el = audio?.media.value
