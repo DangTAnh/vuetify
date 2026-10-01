@@ -6,11 +6,7 @@
     :options="layouts"
   >
     <div>
-      <v-audio class="mx-auto" max-width="480" v-bind="props">
-        <template v-if="model === 'waveform'" v-slot:progress="{ props: seekProps }">
-          <v-audio-waveform v-bind="seekProps" :peaks="peaks"></v-audio-waveform>
-        </template>
-      </v-audio>
+      <v-audio class="mx-auto" max-width="480" v-bind="props"></v-audio>
     </div>
 
     <template v-slot:configuration>
@@ -25,7 +21,7 @@
 
 <script setup>
   const name = 'v-audio'
-  const layouts = ['inline', 'waveform']
+  const layouts = ['inline']
   const timeDisplays = ['elapsed-duration', 'elapsed', 'remaining', 'duration']
 
   const model = shallowRef('default')
@@ -65,14 +61,6 @@
   })
 
   const code = computed(() => {
-    const attrs = propsToString(props.value)
-
-    if (model.value !== 'waveform') return `<${name}${attrs} />`
-
-    return `<${name}${attrs}>
-  <template v-slot:progress="{ props }">
-    <v-audio-waveform v-bind="props" :peaks="peaks" />
-  </template>
-</${name}>`
+    return `<${name}${propsToString(props.value)} />`
   })
 </script>
