@@ -2,7 +2,7 @@
   "description": "Subcomponent for `v-video` used to display a video player controls.",
   "props": {
     "color": "General color applied to icons and sliders.",
-    "backgroundColor": "Container background color.",
+    "bgColor": "Container background color.",
     "trackColor": "Passed to the main slider `color` prop.",
     "playing": "Applies correct icon of the default play button.",
     "hidePlay": "Hides default play button.",

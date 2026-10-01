@@ -60,7 +60,7 @@ export const makeVAudioProps = propsFactory({
   disabled: Boolean,
   readonly: Boolean,
   showBuffer: Boolean,
-  backgroundColor: String,
+  bgColor: String,
 
   ...omit(makeVAudioControlsProps(), ['duration', 'seekable', 'buffer']),
   ...makeComponentProps(),
@@ -89,7 +89,7 @@ export const VAudio = genericComponent<VAudioSlots>()({
     const { themeClasses } = provideTheme(props)
     const { dimensionStyles } = useDimension(props)
     const { roundedClasses, roundedStyles } = useRounded(props)
-    const { backgroundColorClasses, backgroundColorStyles } = useBackgroundColor(toRef(() => props.backgroundColor))
+    const { backgroundColorClasses, backgroundColorStyles } = useBackgroundColor(() => props.bgColor)
 
     const audioRef = shallowRef<HTMLAudioElement>()
     const containerRef = shallowRef<HTMLElement>()

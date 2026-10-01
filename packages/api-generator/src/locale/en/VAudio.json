@@ -13,7 +13,7 @@
     "startAt": "Moves progress to the specified time (in seconds) once the first media file is loaded. A later `src` change starts from the beginning.",
     "disabled": "Removes all interaction and dims the component.",
     "rounded": "Applies a border radius to the container.",
-    "backgroundColor": "Container background color.",
+    "bgColor": "Container background color.",
     "readonly": "Locks the seek surface. Playback, volume and custom actions stay usable.",
     "showBuffer": "Shows how much of the file has been buffered on the seek bar."
   },

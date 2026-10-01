@@ -54,7 +54,7 @@ export type VVideoControlsVariant = typeof allowedVariants[number]
 
 export const makeVVideoControlsProps = propsFactory({
   color: String,
-  backgroundColor: String,
+  bgColor: String,
   trackColor: String,
   playing: Boolean,
   hidePlay: Boolean,
@@ -110,7 +110,7 @@ export const VVideoControls = genericComponent<VVideoControlsSlots>()({
 
     const { backgroundColorClasses, backgroundColorStyles } = useBackgroundColor(() => {
       const fallbackBackground = props.detached ? 'surface' : undefined
-      return props.backgroundColor ?? fallbackBackground
+      return props.bgColor ?? fallbackBackground
     })
 
     const trackColor = toRef(() => {
@@ -119,7 +119,7 @@ export const VVideoControls = genericComponent<VVideoControlsSlots>()({
       }
 
       const fallback = currentTheme.value.dark || !props.pills ? undefined : 'surface'
-      return (props.pills ? props.backgroundColor : props.color) ?? fallback
+      return (props.pills ? props.bgColor : props.color) ?? fallback
     })
 
     const playing = useProxiedModel(props, 'playing')
