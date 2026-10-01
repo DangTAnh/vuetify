@@ -15,10 +15,10 @@ import { forwardRefs } from '@/composables/forwardRefs'
 import { useProxiedModel } from '@/composables/proxiedModel'
 import { makeRoundedProps, useRounded } from '@/composables/rounded'
 import { makeThemeProps, provideTheme } from '@/composables/theme'
+import { useMedia } from '@/labs/composables/media'
 
 // Utilities
 import { onBeforeUnmount, provide, shallowRef, toRef } from 'vue'
-import { useMedia } from './media'
 import { VAudioSymbol } from './shared'
 import { clamp, genericComponent, IN_BROWSER, omit, propsFactory, useRender } from '@/util'
 

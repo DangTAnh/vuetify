@@ -17,7 +17,7 @@
     "progress": "Controls main slider value (0 ~ 100)",
     "duration": "Total duration of the video used to calculate displayed time.",
     "volume": "Volume value passed to the underlying control and slots.",
-    "volumeProps": "Props passed down to the VVideoVolume component."
+    "volumeProps": "Props passed down to the VMediaVolume component."
   },
   "events": {
     "update:playing": "Emitted when the playing state changes.",

@@ -45,6 +45,7 @@ A basic example of the audio player component.
 | [v-audio](/api/v-audio/) | Primary Component |
 | [v-audio-controls](/api/v-audio-controls/) | Sub-component used to display the seek bar and actions |
 | [v-audio-waveform](/api/v-audio-waveform/) | Waveform seek bar, bound through the **progress** slot |
+| [v-media-volume](/api/v-media-volume/) | Volume control of the `volume` action, configured with **volume-props** |
 | [v-seek-bar](/api/v-seek-bar/) | Default seek bar |
 
 <ApiInline hide-links />

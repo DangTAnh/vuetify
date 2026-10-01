@@ -12,7 +12,7 @@
     "VMain"
   ],
   "components/aspect-ratios": ["VResponsive"],
-  "components/audio-players": ["VAudio", "VAudioControls", "VAudioWaveform", "VSeekBar"],
+  "components/audio-players": ["VAudio", "VAudioControls", "VAudioWaveform", "VMediaVolume", "VSeekBar"],
   "components/autocompletes": ["VAutocomplete"],
   "components/avatars": ["VAvatar"],
   "components/avatar-groups": ["VAvatarGroup"],
@@ -175,7 +175,7 @@
     "VTreeviewGroup"
   ],
   "components/vertical-steppers": ["VStepperVertical", "VStepperVerticalActions", "VStepperVerticalItem"],
-  "components/videos": ["VVideo", "VVideoControls", "VVideoVolume"],
+  "components/videos": ["VVideo", "VVideoControls", "VMediaVolume"],
   "components/virtual-scroller": ["VVirtualScroll"],
   "components/windows": ["VWindow", "VWindowItem"],
   "directives/click-outside": ["v-click-outside"],

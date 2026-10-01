@@ -21,10 +21,10 @@ import { useProxiedModel } from '@/composables/proxiedModel'
 import { useRounded } from '@/composables/rounded'
 import { makeThemeProps, provideTheme } from '@/composables/theme'
 import { MaybeTransition } from '@/composables/transition'
+import { useMedia } from '@/labs/composables/media'
 
 // Utilities
 import { onBeforeUnmount, onMounted, shallowRef, toRef, Transition, watch } from 'vue'
-import { useMedia } from '@/labs/VAudio/media'
 import { createRange, genericComponent, omit, pick, propsFactory, useRender } from '@/util'
 
 // Types

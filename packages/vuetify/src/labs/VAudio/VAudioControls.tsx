@@ -6,7 +6,7 @@ import { VDefaultsProvider } from '@/components/VDefaultsProvider'
 import { VSpacer } from '@/components/VGrid'
 import { VIconBtn } from '@/components/VIconBtn/VIconBtn'
 import { VLocaleProvider } from '@/components/VLocaleProvider'
-import { VSlider } from '@/components/VSlider'
+import { VMediaVolume } from '@/labs/VMediaVolume/VMediaVolume'
 import { makeVSeekBarProps, VSeekBar } from '@/labs/VSeekBar/VSeekBar'
 
 // Composables
@@ -16,15 +16,17 @@ import { injectNestedDefaults } from '@/composables/defaults'
 import { useLocale } from '@/composables/locale'
 import { useProxiedModel } from '@/composables/proxiedModel'
 import { makeThemeProps, provideTheme } from '@/composables/theme'
+import { useMute } from '@/labs/composables/media'
 
 // Utilities
 import { computed, Fragment, toRef } from 'vue'
-import { getVolumeIcon, useMute } from './media'
 import { clamp, formatTime, genericComponent, pick, propsFactory, useRender } from '@/util'
 
 // Types
 import type { PropType } from 'vue'
+import type { VSlider } from '@/components/VSlider'
 import type { ClassValue } from '@/composables/component'
+import type { VMediaVolumeOptions } from '@/labs/VMediaVolume/VMediaVolume'
 
 export type VAudioAction = 'play' | 'progress' | 'time' | 'volume' | '-' | (string & {})
 
@@ -108,11 +110,7 @@ export const makeVAudioControlsProps = propsFactory({
     type: String,
     default: '$pause',
   },
-  volumeIcon: String,
-  muteIcon: {
-    type: String,
-    default: '$volumeOff',
-  },
+  volumeProps: Object as PropType<VMediaVolumeOptions>,
 
   color: String,
 
@@ -150,12 +148,6 @@ export const VAudioControls = genericComponent<VAudioControlsSlots>()({
     const progress = toRef(() => clamp(Number(props.progress) || 0, 0, 100))
 
     const { toggleMuted } = useMute(volume)
-
-    const volumeIcon = toRef(() => {
-      if (volume.value <= 0) return props.muteIcon
-
-      return props.volumeIcon ?? getVolumeIcon(volume.value)
-    })
 
     const labels = computed(() => ({
       play: t('$vuetify.media.play'),
@@ -248,12 +240,6 @@ export const VAudioControls = genericComponent<VAudioControlsSlots>()({
           color: props.color ?? btnDefaults.value?.color,
           ...btnDefaults.value,
         },
-        VSlider: {
-          hideDetails: true,
-          thumbSize: 12,
-          trackSize: 2,
-          ...sliderDefaults.value,
-        },
       }
 
       const seekProps: Record<string, unknown> = {
@@ -306,12 +292,6 @@ export const VAudioControls = genericComponent<VAudioControlsSlots>()({
         onClick: togglePlay,
       }
 
-      const muteProps: Record<string, unknown> = {
-        icon: volumeIcon.value,
-        'aria-label': volume.value > 0 ? labels.value.mute : labels.value.unmute,
-        onClick: toggleMuted,
-      }
-
       const builtins: Record<string, () => JSX.Element> = {
         '-': () => <VSpacer />,
         progress: () => progressEl,
@@ -321,22 +301,22 @@ export const VAudioControls = genericComponent<VAudioControlsSlots>()({
           </div>
         ),
         volume: () => (
-          <div class="v-audio-controls__volume">
-            <VIconBtn { ...muteProps } />
-            <VLocaleProvider rtl={ false }>
-              <VSlider
-                color={ props.color }
-                max={ 100 }
-                min={ 0 }
-                modelValue={ volume.value }
-                step={ 1 }
-                aria-label={ labels.value.volume }
-                onUpdate:modelValue={ (v: number) => {
-                  volume.value = v
-                }}
-              />
-            </VLocaleProvider>
-          </div>
+          <VLocaleProvider rtl={ false }>
+            <VMediaVolume
+              v-model={ volume.value }
+              class="v-audio-controls__volume"
+              inline
+              { ...props.volumeProps }
+              sliderProps={{
+                color: props.color,
+                step: 1,
+                thumbSize: 12,
+                trackSize: 2,
+                ...sliderDefaults.value,
+                ...props.volumeProps?.sliderProps,
+              }}
+            />
+          </VLocaleProvider>
         ),
       }
 

@@ -4,11 +4,11 @@
 import './VVideoControls.sass'
 
 // Components
-import { VVideoVolume } from './VVideoVolume'
 import { VDefaultsProvider } from '@/components/VDefaultsProvider/VDefaultsProvider'
 import { VSpacer } from '@/components/VGrid/VSpacer'
 import { VIconBtn } from '@/components/VIconBtn/VIconBtn'
 import { VSlider } from '@/components/VSlider/VSlider'
+import { VMediaVolume } from '@/labs/VMediaVolume/VMediaVolume'
 
 // Composables
 import { useBackgroundColor } from '@/composables/color'
@@ -17,17 +17,18 @@ import { makeElevationProps, useElevation } from '@/composables/elevation'
 import { useLocale } from '@/composables/locale'
 import { useProxiedModel } from '@/composables/proxiedModel'
 import { makeThemeProps, provideTheme } from '@/composables/theme'
+import { useMute } from '@/labs/composables/media'
 
 // Directives
 import vTooltip from '@/directives/tooltip'
 
 // Utilities
 import { computed, toRef } from 'vue'
-import { useMute } from '@/labs/VAudio/media'
 import { formatTime, genericComponent, propsFactory, useRender } from '@/util'
 
 // Types
 import type { PropType, Ref } from 'vue'
+import type { VMediaVolumeOptions } from '@/labs/VMediaVolume/VMediaVolume'
 
 export type VVideoControlsActionsSlot = {
   play: () => void
@@ -79,7 +80,7 @@ export const makeVVideoControlsProps = propsFactory({
     default: 'default',
     validator: (v: any) => allowedVariants.includes(v),
   },
-  volumeProps: Object as PropType<Pick<VVideoVolume['$props'], 'direction' | 'inline' | 'sliderProps' | 'menuProps'>>,
+  volumeProps: Object as PropType<VMediaVolumeOptions>,
 
   ...makeDensityProps(),
   ...makeElevationProps(),
@@ -137,7 +138,7 @@ export const VVideoControls = genericComponent<VVideoControlsSlots>()({
 
     const labels = computed(() => {
       const playIconLocaleKey = playing.value ? 'pause' : 'play'
-      const volumeIconLocaleKey = props.volumeProps?.inline ? (volume.value ? 'mute' : 'unmute') : 'showVolume'
+      const volumeIconLocaleKey = volume.value ? 'mute' : 'unmute'
       const fullscreenIconLocaleKey = props.fullscreen ? 'exitFullscreen' : 'enterFullscreen'
       return {
         seek: t('$vuetify.media.seek'),
@@ -344,13 +345,12 @@ export const VVideoControls = genericComponent<VVideoControlsSlots>()({
                     style={ pillStyles }
                   >
                     { !props.hideVolume && (
-                      <VVideoVolume
+                      <VMediaVolume
                         key="volume-control"
                         sliderProps={{ color: props.color }}
                         modelValue={ volume.value }
                         label={ labels.value.volumeAction }
                         onUpdate:modelValue={ v => volume.value = v }
-                        onClick={ () => props.volumeProps?.inline && toggleMuted() }
                         { ...props.volumeProps }
                       />
                     )}
