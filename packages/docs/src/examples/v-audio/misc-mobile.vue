@@ -2,7 +2,7 @@
   <v-container class="d-flex justify-center">
     <v-defaults-provider :defaults="defaults">
       <v-audio
-        :src="src"
+        :src="track.src"
         actions="prev skip-backward play skip-forward next"
         actions-class="bg-surface-light rounded-pill pa-2 ga-2 mt-2"
         color="primary"
@@ -48,7 +48,11 @@
 </template>
 
 <script setup>
-  const src = 'https://cdn.freesound.org/previews/871/871092_14978258-lq.mp3'
+  const track = {
+    artist: 'HumanStudioED',
+    src: 'https://cdn.pixabay.com/audio/2026/05/08/audio_c0a810ecde.mp3',
+    title: 'No Copyright Cyberpunk',
+  }
   const defaults = {
     VAudioControls: {
       VIconBtn: { color: 'surface', variant: 'flat', width: 60, height: 50, rounded: 'pill' },

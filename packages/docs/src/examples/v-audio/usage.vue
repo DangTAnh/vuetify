@@ -42,7 +42,11 @@
     'lime-accent-4',
   ]
 
-  const peaks = Array.from({ length: 64 }, (_, i) => 0.2 + 0.7 * Math.abs(Math.sin(i / 4)))
+  const track = {
+    artist: 'Bransboynd',
+    src: 'https://cdn.pixabay.com/audio/2025/09/29/audio_8bde82c5c0.mp3',
+    title: 'Mysterious Future Trap',
+  }
 
   const props = computed(() => {
     const inline = model.value !== 'default'
@@ -56,7 +60,7 @@
       'time-display': timeDisplay.value || undefined,
       actions: actions === 'play' ? undefined : actions,
       readonly: readonly.value || undefined,
-      src: 'https://cdn.freesound.org/previews/871/871092_14978258-lq.mp3',
+      src: track.src,
     }
   })
 

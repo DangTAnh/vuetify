@@ -1,7 +1,7 @@
 <template>
   <v-container class="d-flex justify-center">
     <v-card class="pa-6" rounded="xl" width="400">
-      <v-audio :src="src" actions="left play right" progress-class="mb-2">
+      <v-audio :src="track.src" actions="left play right" progress-class="mb-2">
         <template v-slot:left="{ skipBy }">
           <v-icon-btn aria-label="Repeat" icon="mdi-repeat"></v-icon-btn>
           <v-spacer></v-spacer>
@@ -27,5 +27,9 @@
 </template>
 
 <script setup>
-  const src = 'https://cdn.freesound.org/previews/871/871092_14978258-lq.mp3'
+  const track = {
+    artist: 'MemoryArcade',
+    src: 'https://cdn.pixabay.com/audio/2026/02/06/audio_565c388dda.mp3',
+    title: 'Burning Skyline',
+  }
 </script>

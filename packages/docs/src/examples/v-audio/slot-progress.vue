@@ -1,7 +1,7 @@
 <template>
   <v-container max-width="720">
     <v-audio
-      :src="src"
+      :src="track.src"
       actions="prev play next progress rate restart"
       :play-props="{ color: 'primary', size: 36, variant: 'flat' }"
       actions-class="ga-1"
@@ -19,7 +19,7 @@
         <div class="d-flex align-center ga-3 flex-grow-1 mx-1">
           <v-avatar size="44" style="background: linear-gradient(135deg, #673ab7, #00e676)" rounded></v-avatar>
           <div class="d-flex flex-column flex-grow-1">
-            <div class="text-title-small font-weight-medium pb-1" dir="auto">Audio Title 01</div>
+            <div class="text-title-small font-weight-medium pb-1" dir="auto">{{ track.title }}</div>
             <div class="d-flex align-center ga-2 text-body-small">
               {{ currentTime.elapsed }}
               <v-locale-provider :rtl="false">
@@ -59,5 +59,9 @@
 </template>
 
 <script setup>
-  const src = 'https://cdn.freesound.org/previews/871/871092_14978258-lq.mp3'
+  const track = {
+    artist: 'Evgeny_Bardyuzha',
+    src: 'https://cdn.pixabay.com/audio/2022/10/18/audio_31c2730e64.mp3',
+    title: 'Atmospheric Phonk Synthwave (Password Infinity)',
+  }
 </script>

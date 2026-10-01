@@ -1,9 +1,9 @@
 <template>
   <v-container max-width="560">
-    <v-audio :src="src" actions="play progress time">
+    <v-audio :src="track.src" actions="play progress time">
       <template v-slot:append>
         <v-icon-btn
-          :href="src"
+          :href="track.src"
           aria-label="Download"
           icon="mdi-download"
           tag="a"
@@ -16,5 +16,9 @@
 </template>
 
 <script setup>
-  const src = 'https://cdn.freesound.org/previews/871/871092_14978258-lq.mp3'
+  const track = {
+    artist: 'Bransboynd',
+    src: 'https://cdn.pixabay.com/audio/2026/09/07/audio_5e9aae4ea8.mp3',
+    title: 'Cinematic Documentary Background',
+  }
 </script>
