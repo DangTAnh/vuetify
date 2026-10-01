@@ -75,7 +75,10 @@ export const makeVVideoControlsProps = propsFactory({
     type: Number,
     default: 0,
   },
-  volume: [Number, String],
+  volume: {
+    type: [Number, String],
+    default: 100,
+  },
   variant: {
     type: String as PropType<VVideoControlsVariant>,
     default: 'default',
@@ -125,7 +128,7 @@ export const VVideoControls = genericComponent<VVideoControlsSlots>()({
 
     const playing = useProxiedModel(props, 'playing')
     const progress = useProxiedModel(props, 'progress')
-    const volume = useProxiedModel(props, 'volume', 0, (v?: number | string) => Number(v ?? 0))
+    const volume = useProxiedModel(props, 'volume', 100, (v?: number | string) => Number(v ?? 100))
     const { toggleMuted } = useMute(volume)
 
     const currentTime = computed(() => {

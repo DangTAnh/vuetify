@@ -43,6 +43,13 @@ describe('VVideo', () => {
     expect(video().volume).toBeCloseTo(0.4)
   })
 
+  it('should play at full volume when volume is not set', async () => {
+    render(() => <VVideo src={ SILENT_WAV } eager />)
+    await whenLoaded()
+
+    expect(video().volume).toBe(1)
+  })
+
   it('should sync playing and volume both ways', async () => {
     const playing = ref(false)
     const volume = ref(50)

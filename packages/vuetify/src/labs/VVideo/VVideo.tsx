@@ -122,7 +122,7 @@ export const VVideo = genericComponent<VVideoSlots>()({
 
     const playing = useProxiedModel(props, 'playing')
     const progress = useProxiedModel(props, 'progress')
-    const volume = useProxiedModel(props, 'volume', 0, (v?: number | string) => Number(v ?? 0))
+    const volume = useProxiedModel(props, 'volume', 100, (v?: number | string) => Number(v ?? 100))
     const error = useProxiedModel(props, 'error')
 
     const fullscreen = shallowRef(false)
