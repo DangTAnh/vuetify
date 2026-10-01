@@ -200,7 +200,7 @@ export function useMedia<T extends HTMLMediaElement> (
     if (el.value) el.value.srcObject = value ?? null
   })
 
-  watch(() => [props.src, props.srcObject], () => {
+  watch([() => props.src, () => props.srcObject], () => {
     duration.value = 0
     buffered.value = 0
     waiting.value = false
