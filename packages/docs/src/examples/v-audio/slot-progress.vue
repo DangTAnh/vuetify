@@ -15,7 +15,7 @@
         <v-icon-btn aria-label="Next" icon="mdi-skip-next"></v-icon-btn>
       </template>
 
-      <template v-slot:progress="{ progress, skipTo, currentTime, duration }">
+      <template v-slot:progress="{ progress, seek, currentTime, duration }">
         <div class="d-flex align-center ga-3 flex-grow-1 mx-1">
           <v-avatar size="44" style="background: linear-gradient(135deg, #673ab7, #00e676)" rounded></v-avatar>
           <div class="d-flex flex-column flex-grow-1">
@@ -31,7 +31,7 @@
                   thumb-size="12"
                   track-size="2"
                   hide-details
-                  @update:model-value="skipTo"
+                  @update:model-value="v => seek({ to: `${v}%` })"
                 ></v-slider>
               </v-locale-provider>
               {{ currentTime.total }}
@@ -51,8 +51,8 @@
         ></v-chip>
       </template>
 
-      <template v-slot:restart="{ skipTo }">
-        <v-icon-btn aria-label="Restart" icon="mdi-restart" @click="skipTo(0)"></v-icon-btn>
+      <template v-slot:restart="{ seek }">
+        <v-icon-btn aria-label="Restart" icon="mdi-restart" @click="seek({ to: 0 })"></v-icon-btn>
       </template>
     </v-audio>
   </v-container>

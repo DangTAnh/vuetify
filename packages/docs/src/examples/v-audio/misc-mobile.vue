@@ -12,7 +12,7 @@
         <template v-slot:progress="{ props, currentTime }">
           <div class="d-flex align-center ga-2 w-100">
             <v-chip :text="currentTime.elapsed" color="primary" size="small" variant="flat"></v-chip>
-            <v-seek-bar v-bind="props" thumb></v-seek-bar>
+            <v-media-progress-bar v-bind="props" thumb></v-media-progress-bar>
             <v-chip :text="currentTime.total" color="primary" size="small" variant="flat"></v-chip>
           </div>
         </template>
@@ -21,8 +21,8 @@
           <v-icon-btn aria-label="Previous" color="secondary" icon="mdi-skip-previous"></v-icon-btn>
         </template>
 
-        <template v-slot:skip-backward="{ skipBy }">
-          <v-icon-btn aria-label="Rewind 10 seconds" icon="mdi-rewind-10" @click="skipBy(-10)"></v-icon-btn>
+        <template v-slot:skip-backward="{ seek }">
+          <v-icon-btn aria-label="Rewind 10 seconds" icon="mdi-rewind-10" @click="seek({ by: -10 })"></v-icon-btn>
         </template>
 
         <template v-slot:play="{ props, playing }">
@@ -35,8 +35,8 @@
           ></v-icon-btn>
         </template>
 
-        <template v-slot:skip-forward="{ skipBy }">
-          <v-icon-btn aria-label="Forward 10 seconds" icon="mdi-fast-forward-10" @click="skipBy(10)"></v-icon-btn>
+        <template v-slot:skip-forward="{ seek }">
+          <v-icon-btn aria-label="Forward 10 seconds" icon="mdi-fast-forward-10" @click="seek({ by: 10 })"></v-icon-btn>
         </template>
 
         <template v-slot:next>

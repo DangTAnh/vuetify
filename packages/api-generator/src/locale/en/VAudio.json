@@ -35,7 +35,7 @@
     "loader": "Slot used to replace the loader displayed while the audio is being loaded.",
     "error": "Replaces the warning icon in the overlay shown over the controls in the error state. Receives the MediaError.",
     "sources": "Slot for content placed within the native `<audio>` element.",
-    "progress": "Replaces the seek bar. Receives `props` to bind on `v-seek-bar` or `v-audio-waveform`.",
+    "progress": "Replaces the seek bar. Receives `props` to bind on `v-media-progress-bar` or `v-audio-waveform`.",
     "play": "Replaces the play button. Receives `props` to bind on your own button."
   },
   "exposed": {
@@ -43,8 +43,7 @@
     "play": "Start playback.",
     "pause": "Pause playback.",
     "stop": "Pause playback and return to the start.",
-    "skipTo": "Skip to a specific point in the playback. Accepts a percent value (0-100).",
-    "skipBy": "Move the playback position by a number of seconds, positive or negative.",
+    "seek": "Move the playback position with `{ to }` or `{ by }`. Numbers are seconds, strings ending in `%` are relative to the duration, e.g. `seek({ to: '50%' })` or `seek({ by: -10 })`.",
     "retry": "Clear the error state and load the source again.",
     "toggleMuted": "Mute/unmute audio."
   }

@@ -3,7 +3,8 @@
   "props": {
     "color": "General color applied to icons and sliders.",
     "bgColor": "Container background color.",
-    "trackColor": "Passed to the main slider `color` prop.",
+    "trackColor": "Color of the played part of the progress bar.",
+    "buffer": "Buffered position in seconds, shown on the progress bar.",
     "playing": "Applies correct icon of the default play button.",
     "hidePlay": "Hides default play button.",
     "hideProgressBar": "Hides default progress bar.",
@@ -23,7 +24,6 @@
     "update:playing": "Emitted when the playing state changes.",
     "update:progress": "Emitted when the playback progress changes.",
     "update:volume": "Emitted when the volume value changes.",
-    "skip": "Emitted when a skip action is triggered.",
     "click:fullscreen": "Emitted when the fullscreen button is clicked."
   },
   "exposed": {

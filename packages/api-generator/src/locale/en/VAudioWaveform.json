@@ -1,5 +1,5 @@
 {
-  "description": "Subcomponent for `v-audio` that draws an amplitude waveform on top of `v-seek-bar`. Bind it in the `progress` slot of `v-audio`, or use it on its own with `peaks` and a model.",
+  "description": "Subcomponent for `v-audio` that draws an amplitude waveform on top of `v-media-progress-bar`. Bind it in the `progress` slot of `v-audio`, or use it on its own with `peaks` and a model.",
   "props": {
     "peaks": "Precomputed amplitude values, normalized 0 to 1. Takes precedence over `peaks-source`.",
     "peaksSource": "Audio file decoded in the browser to draw the waveform, such as a `File` from `v-file-input` or a `Blob` fetched by the app. Decoding starts once the duration is known. MP3 and AAC decode at any length; other formats only up to 30 minutes.",

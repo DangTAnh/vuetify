@@ -117,8 +117,7 @@ export const VAudio = genericComponent<VAudioSlots>()({
       play,
       pause,
       stop,
-      skipTo,
-      skipBy,
+      seek,
       retry,
     } = useMedia(audioRef, props, {
       playing,
@@ -153,8 +152,8 @@ export const VAudio = genericComponent<VAudioSlots>()({
         ? clamp(100 * shown / total, 0, 100)
         : 0
 
-      for (const el of containerRef.value?.querySelectorAll<HTMLElement>('.v-seek-bar') ?? []) {
-        el.style.setProperty('--v-seek-bar-playhead', `${playhead}%`)
+      for (const el of containerRef.value?.querySelectorAll<HTMLElement>('.v-media-progress-bar') ?? []) {
+        el.style.setProperty('--v-media-progress-bar-playhead', `${playhead}%`)
       }
     }
 
@@ -179,8 +178,8 @@ export const VAudio = genericComponent<VAudioSlots>()({
     function stopTicking () {
       if (frame) cancelAnimationFrame(frame)
       frame = 0
-      for (const el of containerRef.value?.querySelectorAll<HTMLElement>('.v-seek-bar') ?? []) {
-        el.style.removeProperty('--v-seek-bar-playhead')
+      for (const el of containerRef.value?.querySelectorAll<HTMLElement>('.v-media-progress-bar') ?? []) {
+        el.style.removeProperty('--v-media-progress-bar-playhead')
       }
     }
 
@@ -252,7 +251,7 @@ export const VAudio = genericComponent<VAudioSlots>()({
             duration={ duration.value }
             buffer={ props.showBuffer ? buffered.value : 0 }
             seekable={ seekable.value }
-            onUpdate:progress={ skipTo }
+            onUpdate:progress={ (percent: number) => seek({ to: `${percent}%` }) }
             onScrubStart={ () => {
               scrubbing.value = true
             }}
@@ -301,8 +300,7 @@ export const VAudio = genericComponent<VAudioSlots>()({
       play,
       pause,
       stop,
-      skipTo,
-      skipBy,
+      seek,
       retry,
     }, controlsRef)
   },

@@ -1,5 +1,5 @@
 // Styles
-import './VSeekBar.sass'
+import './VMediaProgressBar.sass'
 
 // Composables
 import { useTextColor } from '@/composables/color'
@@ -16,14 +16,14 @@ import { clamp, convertToUnit, formatTime, genericComponent, isObject, keyValues
 // Types
 import type { PropType } from 'vue'
 
-export type VSeekBarChapter = { start: number, title?: string }
+export type VMediaProgressBarChapter = { start: number, title?: string }
 
-export type VSeekBarSlots = {
+export type VMediaProgressBarSlots = {
   default: never
   tooltip: { time: string, chapter: string | undefined, seconds: number }
 }
 
-export const makeVSeekBarProps = propsFactory({
+export const makeVMediaProgressBarProps = propsFactory({
   modelValue: {
     type: Number,
     default: 0,
@@ -37,7 +37,7 @@ export const makeVSeekBarProps = propsFactory({
     default: 0,
   },
   chapters: {
-    type: Array as PropType<readonly VSeekBarChapter[]>,
+    type: Array as PropType<readonly VMediaProgressBarChapter[]>,
     default: () => [],
   },
   chapterGap: {
@@ -68,12 +68,12 @@ export const makeVSeekBarProps = propsFactory({
   ...makeComponentProps(),
   ...makeRoundedProps(),
   ...makeThemeProps(),
-}, 'VSeekBar')
+}, 'VMediaProgressBar')
 
-export const VSeekBar = genericComponent<VSeekBarSlots>()({
-  name: 'VSeekBar',
+export const VMediaProgressBar = genericComponent<VMediaProgressBarSlots>()({
+  name: 'VMediaProgressBar',
 
-  props: makeVSeekBarProps(),
+  props: makeVMediaProgressBarProps(),
 
   emits: {
     'update:modelValue': (value: number) => true,
@@ -191,12 +191,12 @@ export const VSeekBar = genericComponent<VSeekBarSlots>()({
         <div
           ref={ rootRef }
           class={[
-            'v-seek-bar',
+            'v-media-progress-bar',
             {
-              'v-seek-bar--disabled': props.disabled,
-              'v-seek-bar--dragging': dragging.value,
-              'v-seek-bar--interactive': interactive.value,
-              'v-seek-bar--tooltip-bottom': tooltip.location === 'bottom',
+              'v-media-progress-bar--disabled': props.disabled,
+              'v-media-progress-bar--dragging': dragging.value,
+              'v-media-progress-bar--interactive': interactive.value,
+              'v-media-progress-bar--tooltip-bottom': tooltip.location === 'bottom',
             },
             themeClasses.value,
             textColorClasses.value,
@@ -204,10 +204,10 @@ export const VSeekBar = genericComponent<VSeekBarSlots>()({
           ]}
           style={[
             {
-              '--v-seek-bar-position': `${percent(model.value)}%`,
-              '--v-seek-bar-buffer': `${percent(props.buffer)}%`,
-              '--v-seek-bar-height': convertToUnit(props.height),
-              '--v-seek-bar-tooltip-offset': convertToUnit(tooltip.offset),
+              '--v-media-progress-bar-position': `${percent(model.value)}%`,
+              '--v-media-progress-bar-buffer': `${percent(props.buffer)}%`,
+              '--v-media-progress-bar-height': convertToUnit(props.height),
+              '--v-media-progress-bar-tooltip-offset': convertToUnit(tooltip.offset),
             },
             textColorStyles.value,
             props.style,
@@ -230,26 +230,26 @@ export const VSeekBar = genericComponent<VSeekBarSlots>()({
           onKeydown={ onKeydown }
         >
           <div
-            class={['v-seek-bar__track', roundedClasses.value]}
+            class={['v-media-progress-bar__track', roundedClasses.value]}
             style={[roundedStyles.value, maskStyles.value]}
           >
             { slots.default?.() ?? (
               <>
-                <div class={['v-seek-bar__background', bgColorClasses.value]} style={ bgColorStyles.value } />
-                <div class="v-seek-bar__buffer" />
-                <div class="v-seek-bar__fill" />
+                <div class={['v-media-progress-bar__background', bgColorClasses.value]} style={ bgColorStyles.value } />
+                <div class="v-media-progress-bar__buffer" />
+                <div class="v-media-progress-bar__fill" />
               </>
             )}
           </div>
 
           { props.thumb && (
-            <div key="thumb" class="v-seek-bar__thumb" />
+            <div key="thumb" class="v-media-progress-bar__thumb" />
           )}
 
           { hasTooltip && (
             <div
               key="tooltip"
-              class="v-seek-bar__tooltip"
+              class="v-media-progress-bar__tooltip"
               style={{ left: `${hover.value! * 100}%` }}
             >
               { slots.tooltip?.({
@@ -259,7 +259,7 @@ export const VSeekBar = genericComponent<VSeekBarSlots>()({
               }) ?? (
                 <>
                   { hoverChapter && (
-                    <div key="chapter" class="v-seek-bar__chapter">{ hoverChapter }</div>
+                    <div key="chapter" class="v-media-progress-bar__chapter">{ hoverChapter }</div>
                   )}
                   { formatTime(hoverSeconds) }
                 </>
@@ -274,4 +274,4 @@ export const VSeekBar = genericComponent<VSeekBarSlots>()({
   },
 })
 
-export type VSeekBar = InstanceType<typeof VSeekBar>
+export type VMediaProgressBar = InstanceType<typeof VMediaProgressBar>

@@ -51,7 +51,7 @@ describe('VAudio', () => {
       </VLocaleProvider>
     ))
 
-    expect(getComputedStyle(document.querySelector('.v-seek-bar')!).direction).toBe('ltr')
+    expect(getComputedStyle(document.querySelector('.v-media-progress-bar')!).direction).toBe('ltr')
     expect(document.querySelector('.test-custom')).toHaveClass('v-locale--is-rtl')
   })
 
@@ -59,7 +59,7 @@ describe('VAudio', () => {
     const playing = ref(false)
     render(() => <VAudio src={ SILENT_WAV } v-model:playing={ playing.value } readonly />)
 
-    expect(document.querySelector('.v-seek-bar')).toHaveAttribute('aria-readonly', 'true')
+    expect(document.querySelector('.v-media-progress-bar')).toHaveAttribute('aria-readonly', 'true')
 
     await userEvent.click(screen.getByCSS('.v-audio__action-play'))
     expect(playing.value).toBe(true)

@@ -7,7 +7,7 @@ import './VVideoControls.sass'
 import { VDefaultsProvider } from '@/components/VDefaultsProvider/VDefaultsProvider'
 import { VSpacer } from '@/components/VGrid/VSpacer'
 import { VIconBtn } from '@/components/VIconBtn/VIconBtn'
-import { VSlider } from '@/components/VSlider/VSlider'
+import { makeVMediaProgressBarProps, VMediaProgressBar } from '@/labs/VMediaProgressBar/VMediaProgressBar'
 import { VMediaVolume } from '@/labs/VMediaVolume/VMediaVolume'
 
 // Composables
@@ -17,23 +17,24 @@ import { makeElevationProps, useElevation } from '@/composables/elevation'
 import { useLocale } from '@/composables/locale'
 import { useProxiedModel } from '@/composables/proxiedModel'
 import { makeThemeProps, provideTheme } from '@/composables/theme'
-import { useMute } from '@/labs/composables/media'
+import { resolveSeekTarget, useMute } from '@/labs/composables/media'
 
 // Directives
 import vTooltip from '@/directives/tooltip'
 
 // Utilities
 import { computed, toRef } from 'vue'
-import { formatTime, genericComponent, propsFactory, useRender } from '@/util'
+import { clamp, formatTime, genericComponent, pick, propsFactory, useRender } from '@/util'
 
 // Types
 import type { PropType, Ref } from 'vue'
+import type { MediaSeekTarget } from '@/labs/composables/media'
 import type { VMediaVolumeOptions } from '@/labs/VMediaVolume/VMediaVolume'
 
 export type VVideoControlsActionsSlot = {
   play: () => void
   pause: () => void
-  skipTo: (v: number) => void
+  seek: (target: MediaSeekTarget) => void
   volume: Ref<number>
   playing: boolean
   progress: number
@@ -82,6 +83,7 @@ export const makeVVideoControlsProps = propsFactory({
   },
   volumeProps: Object as PropType<VMediaVolumeOptions>,
 
+  ...pick(makeVMediaProgressBarProps(), ['buffer']),
   ...makeDensityProps(),
   ...makeElevationProps(),
   ...makeThemeProps(),
@@ -98,7 +100,6 @@ export const VVideoControls = genericComponent<VVideoControlsSlots>()({
     'update:playing': (val: boolean) => true,
     'update:progress': (val: number) => true,
     'update:volume': (val: number) => true,
-    skip: (val: number) => true,
     'click:fullscreen': () => true,
   },
 
@@ -157,8 +158,11 @@ export const VVideoControls = genericComponent<VVideoControlsSlots>()({
       playing.value = false
     }
 
-    function skipTo (v: number) {
-      progress.value = v
+    function seek (target: MediaSeekTarget) {
+      if (!props.duration) return
+
+      const seconds = resolveSeekTarget(target, props.progress / 100 * props.duration, props.duration)
+      if (Number.isFinite(seconds)) progress.value = clamp(seconds / props.duration * 100, 0, 100)
     }
 
     function toggleFullscreen () {
@@ -204,7 +208,7 @@ export const VVideoControls = genericComponent<VVideoControlsSlots>()({
         playing: playing.value,
         progress: progress.value,
         currentTime: currentTime.value,
-        skipTo,
+        seek,
         volume,
         toggleMuted,
         fullscreen: props.fullscreen,
@@ -282,20 +286,17 @@ export const VVideoControls = genericComponent<VVideoControlsSlots>()({
                     { props.hideProgressBar
                       ? <VSpacer />
                       : (
-                          <VSlider
-                            modelValue={ props.progress }
-                            noKeyboard
-                            color={ trackColor.value ?? 'surface-variant' }
-                            trackColor={ props.variant === 'tube' ? 'white' : undefined }
+                          <VMediaProgressBar
                             class="v-video__track"
-                            thumbLabel="always"
-                            aria-label={ labels.value.seek }
-                            onUpdate:modelValue={ skipTo }
-                          >
-                            {{
-                              'thumb-label': () => currentTime.value.elapsed,
-                            }}
-                          </VSlider>
+                            modelValue={ props.progress / 100 * props.duration }
+                            max={ props.duration }
+                            buffer={ props.buffer }
+                            color={ trackColor.value ?? 'surface-variant' }
+                            bgColor={ props.variant === 'tube' ? 'white' : undefined }
+                            step={ 10 }
+                            thumb
+                            onUpdate:modelValue={ (seconds: number) => seek({ to: seconds }) }
+                          />
                       )
                     }
                     { props.variant === 'tube' && <VSpacer /> }

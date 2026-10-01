@@ -1,9 +1,11 @@
 // Utilities
 import { nextTick, onScopeDispose, shallowRef, watch } from 'vue'
-import { clamp } from '@/util'
+import { clamp, isString } from '@/util'
 
 // Types
 import type { Ref } from 'vue'
+
+export type MediaSeekTarget = { to: number | string } | { by: number | string }
 
 export interface MediaProps {
   src?: string
@@ -26,6 +28,15 @@ export interface MediaOptions<T extends HTMLMediaElement> {
 
 function toElementVolume (volume: number) {
   return clamp(Number(volume) || 0, 0, 100) / 100
+}
+
+export function resolveSeekTarget (target: MediaSeekTarget, current: number, total: number) {
+  const value = 'to' in target ? target.to : target.by
+  const seconds = isString(value) && value.trim().endsWith('%')
+    ? parseFloat(value) / 100 * total
+    : Number(value)
+
+  return 'to' in target ? seconds : current + seconds
 }
 
 export function useMedia<T extends HTMLMediaElement> (
@@ -58,18 +69,12 @@ export function useMedia<T extends HTMLMediaElement> (
     writePosition(next, total)
   }
 
-  function skipTo (percent: number) {
-    const total = el.value?.duration
-    if (!Number.isFinite(total ?? Number.NaN)) return
-
-    seekTo(clamp(percent, 0, 100) / 100 * (total as number))
-  }
-
-  function skipBy (seconds: number) {
+  function seek (target: MediaSeekTarget) {
     const media = el.value
     if (!media) return
 
-    seekTo(media.currentTime + seconds)
+    const seconds = resolveSeekTarget(target, media.currentTime, media.duration)
+    if (Number.isFinite(seconds)) seekTo(seconds)
   }
 
   async function play () {
@@ -228,9 +233,7 @@ export function useMedia<T extends HTMLMediaElement> (
     play,
     pause,
     stop,
-    seekTo,
-    skipTo,
-    skipBy,
+    seek,
     retry,
   }
 }

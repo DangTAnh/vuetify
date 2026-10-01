@@ -14,7 +14,7 @@
       hide-overlay
       pills
     >
-      <template v-slot:controls="{ play, pause, playing, progress, skipTo, volume, fullscreen, toggleFullscreen, labels }">
+      <template v-slot:controls="{ play, pause, playing, progress, seek, volume, fullscreen, toggleFullscreen, labels }">
         <v-defaults-provider :defaults="{ VIconBtn: { color: 'red', rounded: 'lg', size: '36', variant: 'flat' }, VSlider: { color: 'red', trackColor: 'white' } }">
           <div class="d-flex ga-3 w-100 px-2">
             <v-icon-btn
@@ -28,7 +28,7 @@
               :model-value="progress"
               width="75%"
               no-keyboard
-              @update:model-value="skipTo"
+              @update:model-value="v => seek({ to: `${v}%` })"
             ></v-slider>
             <v-media-volume
               v-model="volume.value"

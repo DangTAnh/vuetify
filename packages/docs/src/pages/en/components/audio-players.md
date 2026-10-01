@@ -45,8 +45,8 @@ A basic example of the audio player component.
 | [v-audio](/api/v-audio/) | Primary Component |
 | [v-audio-controls](/api/v-audio-controls/) | Sub-component used to display the seek bar and actions |
 | [v-audio-waveform](/api/v-audio-waveform/) | Waveform seek bar, bound through the **progress** slot |
+| [v-media-progress-bar](/api/v-media-progress-bar/) | Default seek bar |
 | [v-media-volume](/api/v-media-volume/) | Volume control of the `volume` action, configured with **volume-props** |
-| [v-seek-bar](/api/v-seek-bar/) | Default seek bar |
 
 <ApiInline hide-links />
 
@@ -78,7 +78,7 @@ Without `progress` in the list, the seek bar gets its own row above the actions,
 
 #### Waveform
 
-`v-audio-waveform` replaces the seek bar through the **progress** slot. Its `props` fit both `v-seek-bar` and `v-audio-waveform`, so `v-bind="props"` wires position, duration and seeking. Pass **peaks**, an array of amplitudes between 0 and 1, one per bar. Compute them where the file is produced and store them alongside it.
+`v-audio-waveform` replaces the seek bar through the **progress** slot. Its `props` fit both `v-media-progress-bar` and `v-audio-waveform`, so `v-bind="props"` wires position, duration and seeking. Pass **peaks**, an array of amplitudes between 0 and 1, one per bar. Compute them where the file is produced and store them alongside it.
 
 <ExamplesExample file="v-audio/prop-waveform" />
 
@@ -94,13 +94,13 @@ The waveform never downloads the file itself. To decode in the browser, pass the
 
 #### Custom actions
 
-Each custom action name in **actions** becomes a slot that receives the player state and methods: `playing`, `progress`, `currentTime`, `duration`, `play`, `pause`, `skipTo`, `skipBy`, `setPlaybackRate` and more. The **play** slot also receives `props` for the built-in button, so `v-bind="props"` keeps the icon and label in sync. To only restyle the built-in button, pass **play-props** instead. Buttons rendered in slots follow `VAudioControls` defaults, and **actions-class** and **progress-class** style the rows.
+Each custom action name in **actions** becomes a slot that receives the player state and methods: `playing`, `progress`, `currentTime`, `duration`, `play`, `pause`, `seek`, `setPlaybackRate` and more. `seek({ to })` and `seek({ by })` take seconds, or a string such as `'50%'` relative to the duration. The **play** slot also receives `props` for the built-in button, so `v-bind="props"` keeps the icon and label in sync. To only restyle the built-in button, pass **play-props** instead. Buttons rendered in slots follow `VAudioControls` defaults, and **actions-class** and **progress-class** style the rows.
 
 <ExamplesExample file="v-audio/slot-actions" />
 
 #### Progress
 
-The **progress** slot replaces the seek bar. Use it to put a title and artwork next to the bar, or to bring your own seek control. Its `props` bind to `v-seek-bar` and `v-audio-waveform`; **chapters**, **thumb** and **tooltip** set on `v-audio` are included.
+The **progress** slot replaces the seek bar. Use it to put a title and artwork next to the bar, or to bring your own seek control. Its `props` bind to `v-media-progress-bar` and `v-audio-waveform`; **chapters**, **thumb** and **tooltip** set on `v-audio` are included.
 
 <ExamplesExample file="v-audio/slot-progress" />
 

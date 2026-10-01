@@ -60,13 +60,15 @@ describe('VVideo', () => {
     expect(video().volume).toBeCloseTo(0.2)
   })
 
-  it('should seek from skipTo and the arrow keys', async () => {
+  it('should seek from seek() and the arrow keys', async () => {
     const vm = ref<VVideo>()
     render(() => <VVideo ref={ vm } src={ SILENT_WAV } eager />)
     await whenLoaded()
 
-    vm.value!.skipTo(50)
+    vm.value!.seek({ to: '50%' })
     expect(video().currentTime).toBe(2)
+    vm.value!.seek({ by: -1 })
+    expect(video().currentTime).toBe(1)
 
     const press = (key: string) => screen.getByCSS('.v-video').dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true }))
     press('ArrowRight')

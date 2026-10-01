@@ -2,13 +2,13 @@
 @use './variables' as *
 
 @include tools.layer('components')
-  .v-seek-bar
-    --v-seek-bar-at: var(--v-seek-bar-playhead, var(--v-seek-bar-position))
+  .v-media-progress-bar
+    --v-media-progress-bar-at: var(--v-media-progress-bar-playhead, var(--v-media-progress-bar-position))
     align-items: center
     direction: ltr
     display: flex
     flex: 1 1 auto
-    min-height: $seek-bar-hit-height
+    min-height: $media-progress-bar-hit-height
     position: relative
     touch-action: none
     user-select: none
@@ -17,19 +17,19 @@
       cursor: pointer
 
     &--disabled
-      opacity: $seek-bar-disabled-opacity
+      opacity: $media-progress-bar-disabled-opacity
 
     &:focus-visible
       outline: none
 
-      &:not(:has(.v-seek-bar__thumb)),
-      .v-seek-bar__thumb
+      &:not(:has(.v-media-progress-bar__thumb)),
+      .v-media-progress-bar__thumb
         outline: 2px solid currentColor
         outline-offset: 2px
 
     &__track
       flex: 1 1 auto
-      height: var(--v-seek-bar-height)
+      height: var(--v-media-progress-bar-height)
       overflow: hidden
       position: relative
 
@@ -41,38 +41,38 @@
       position: absolute
 
     &__background
-      opacity: $seek-bar-background-opacity
+      opacity: $media-progress-bar-background-opacity
 
     &__buffer
-      clip-path: inset(0 calc(100% - var(--v-seek-bar-buffer)) 0 0)
-      opacity: $seek-bar-buffer-opacity
+      clip-path: inset(0 calc(100% - var(--v-media-progress-bar-buffer)) 0 0)
+      opacity: $media-progress-bar-buffer-opacity
 
     &__fill
-      clip-path: inset(0 calc(100% - var(--v-seek-bar-at)) 0 0)
+      clip-path: inset(0 calc(100% - var(--v-media-progress-bar-at)) 0 0)
 
     &__thumb
       background: currentColor
       border-radius: 50%
-      height: $seek-bar-thumb-size
-      left: var(--v-seek-bar-at)
+      height: $media-progress-bar-thumb-size
+      left: var(--v-media-progress-bar-at)
       pointer-events: none
       position: absolute
       top: 50%
       transform: translate(-50%, -50%)
-      width: $seek-bar-thumb-size
+      width: $media-progress-bar-thumb-size
 
     &--disabled &__thumb
       display: none
 
     &__tooltip
-      background: $seek-bar-tooltip-background
-      border-radius: $seek-bar-tooltip-border-radius
-      bottom: calc(100% + var(--v-seek-bar-tooltip-offset, #{$seek-bar-tooltip-offset}))
-      color: $seek-bar-tooltip-color
-      font-size: $seek-bar-tooltip-font-size
+      background: $media-progress-bar-tooltip-background
+      border-radius: $media-progress-bar-tooltip-border-radius
+      bottom: calc(100% + var(--v-media-progress-bar-tooltip-offset, #{$media-progress-bar-tooltip-offset}))
+      color: $media-progress-bar-tooltip-color
+      font-size: $media-progress-bar-tooltip-font-size
       font-variant-numeric: tabular-nums
       line-height: 1.4
-      padding: $seek-bar-tooltip-padding
+      padding: $media-progress-bar-tooltip-padding
       pointer-events: none
       position: absolute
       text-align: center
@@ -82,18 +82,18 @@
 
     &--tooltip-bottom &__tooltip
       bottom: auto
-      top: calc(100% + var(--v-seek-bar-tooltip-offset, #{$seek-bar-tooltip-offset}))
+      top: calc(100% + var(--v-media-progress-bar-tooltip-offset, #{$media-progress-bar-tooltip-offset}))
 
     &__chapter
       font-weight: 500
 
   @include tools.layer('trumps')
     @media (forced-colors: active)
-      .v-seek-bar__track
+      .v-media-progress-bar__track
         forced-color-adjust: none
         color: CanvasText
 
-      .v-seek-bar__fill,
-      .v-seek-bar__thumb
+      .v-media-progress-bar__fill,
+      .v-media-progress-bar__thumb
         forced-color-adjust: none
         background: Highlight

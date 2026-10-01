@@ -2,7 +2,7 @@
 import './VAudioWaveform.sass'
 
 // Components
-import { makeVSeekBarProps, VSeekBar } from '@/labs/VSeekBar/VSeekBar'
+import { makeVMediaProgressBarProps, VMediaProgressBar } from '@/labs/VMediaProgressBar/VMediaProgressBar'
 
 // Composables
 import { useTextColor } from '@/composables/color'
@@ -27,10 +27,10 @@ import {
 // Types
 import type { PropType } from 'vue'
 import type { SampleStrategy } from './peaks'
-import type { VSeekBarSlots } from '@/labs/VSeekBar/VSeekBar'
+import type { VMediaProgressBarSlots } from '@/labs/VMediaProgressBar/VMediaProgressBar'
 
 export type VAudioWaveformSlots = {
-  tooltip: VSeekBarSlots['tooltip']
+  tooltip: VMediaProgressBarSlots['tooltip']
 }
 
 const RISE_DURATION = 400
@@ -64,7 +64,7 @@ export const makeVAudioWaveformProps = propsFactory({
   mirror: [Boolean, Number, String],
   live: Boolean,
 
-  ...makeVSeekBarProps({ height: 32 }),
+  ...makeVMediaProgressBarProps({ height: 32 }),
 }, 'VAudioWaveform')
 
 export const VAudioWaveform = genericComponent<VAudioWaveformSlots>()({
@@ -276,15 +276,15 @@ export const VAudioWaveform = genericComponent<VAudioWaveformSlots>()({
     })
 
     useRender(() => {
-      const seekBarProps = VSeekBar.filterProps(props)
+      const progressBarProps = VMediaProgressBar.filterProps(props)
       const layers = props.buffer > 0
         ? ['track', 'buffer', 'progress'] as const
         : ['track', 'progress'] as const
 
       return (
-        <VSeekBar
+        <VMediaProgressBar
           ref={ resizeRef }
-          { ...seekBarProps }
+          { ...progressBarProps }
           class={[
             'v-audio-waveform',
             { 'v-audio-waveform--live': props.live },
@@ -333,7 +333,7 @@ export const VAudioWaveform = genericComponent<VAudioWaveformSlots>()({
             ),
             tooltip: slots.tooltip,
           }}
-        </VSeekBar>
+        </VMediaProgressBar>
       )
     })
 

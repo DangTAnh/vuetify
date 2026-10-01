@@ -32,7 +32,7 @@
     "prepend": "Additional content on the left within the control bar.",
     "append": "Additional content on the right within the control bar.",
     "time": "Replaces the time text. Receives the elapsed, remaining and total time already formatted.",
-    "progress": "Replaces the seek bar. Receives `props` to bind on `v-seek-bar` or `v-audio-waveform`.",
+    "progress": "Replaces the seek bar. Receives `props` to bind on `v-media-progress-bar` or `v-audio-waveform`.",
     "play": "Replaces the play button. Receives `props` to bind on your own button."
   },
   "exposed": {

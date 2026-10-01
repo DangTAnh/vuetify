@@ -1,16 +1,16 @@
 // Components
-import { VSeekBar } from '../VSeekBar'
+import { VMediaProgressBar } from '../VMediaProgressBar'
 
 // Utilities
 import { commands, render, screen, userEvent } from '@test'
 import { ref } from 'vue'
 
-describe('VSeekBar', () => {
+describe('VMediaProgressBar', () => {
   it('should seek with fractional seconds rather than whole percent', async () => {
     const model = ref(0)
-    render(() => <div style="width: 1000px"><VSeekBar v-model={ model.value } max={ 3600 } /></div>)
+    render(() => <div style="width: 1000px"><VMediaProgressBar v-model={ model.value } max={ 3600 } /></div>)
 
-    const rect = screen.getByCSS('.v-seek-bar').getBoundingClientRect()
+    const rect = screen.getByCSS('.v-media-progress-bar').getBoundingClientRect()
     const x = rect.left + rect.width * 0.2345
     const y = rect.top + rect.height / 2
     await commands.drag([x, y], [x, y])
@@ -21,9 +21,9 @@ describe('VSeekBar', () => {
 
   it('should step, page and jump from the keyboard', async () => {
     const model = ref(50)
-    render(() => <VSeekBar v-model={ model.value } max={ 100 } step={ 5 } />)
+    render(() => <VMediaProgressBar v-model={ model.value } max={ 100 } step={ 5 } />)
 
-    screen.getByCSS('.v-seek-bar').focus()
+    screen.getByCSS('.v-media-progress-bar').focus()
     await userEvent.keyboard('{ArrowRight}')
     expect(model.value).toBe(55)
     await userEvent.keyboard('{Shift>}{ArrowLeft}{/Shift}')
@@ -38,14 +38,14 @@ describe('VSeekBar', () => {
 
   it('should name the chapter in the tooltip and the announced value', async () => {
     const chapters = [{ start: 0, title: 'Intro' }, { start: 60, title: 'Verse' }]
-    render(() => <div style="width: 400px"><VSeekBar modelValue={ 90 } max={ 120 } chapters={ chapters } /></div>)
+    render(() => <div style="width: 400px"><VMediaProgressBar modelValue={ 90 } max={ 120 } chapters={ chapters } /></div>)
 
-    const bar = screen.getByCSS('.v-seek-bar')
+    const bar = screen.getByCSS('.v-media-progress-bar')
     expect(bar).toHaveAttribute('aria-valuetext', '1:30 / 2:00, Verse')
 
     const rect = bar.getBoundingClientRect()
     await userEvent.hover(bar, { position: { x: rect.width * 0.25, y: rect.height / 2 } })
 
-    expect(screen.getByCSS('.v-seek-bar__tooltip')).toHaveTextContent('Intro0:30')
+    expect(screen.getByCSS('.v-media-progress-bar__tooltip')).toHaveTextContent('Intro0:30')
   })
 })

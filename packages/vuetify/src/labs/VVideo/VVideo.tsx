@@ -50,13 +50,14 @@ export const makeVVideoProps = propsFactory({
   autoplay: Boolean,
   muted: Boolean,
   eager: Boolean,
-  error: [Object, Boolean] as PropType<MediaError | boolean>,
+  error: [Boolean, Object] as PropType<MediaError | boolean>,
   src: String,
-  srcObject: Object as PropType<MediaStream | MediaSource | Blob>,
+  srcObject: [Object, null] as PropType<MediaProvider | null>,
   type: String, // e.g. video/mp4
   image: String,
   hideOverlay: Boolean,
   noFullscreen: Boolean,
+  showBuffer: Boolean,
   startAt: [Number, String],
   variant: {
     type: String as PropType<Variant>,
@@ -81,6 +82,7 @@ export const makeVVideoProps = propsFactory({
   ...makeDimensionProps(),
   ...makeThemeProps(),
   ...omit(makeVVideoControlsProps(), [
+    'buffer',
     'fullscreen',
     'variant',
   ]),
@@ -96,7 +98,7 @@ export const VVideo = genericComponent<VVideoSlots>()({
   emits: {
     error: (val: MediaError | boolean) => true,
     loaded: (element: HTMLVideoElement) => true,
-    'update:error': (val: boolean) => true,
+    'update:error': (val: MediaError | boolean) => true,
     'update:playing': (val: boolean) => true,
     'update:progress': (val: number) => true,
     'update:volume': (val: number) => true,
@@ -128,7 +130,7 @@ export const VVideo = genericComponent<VVideoSlots>()({
     const loaded = shallowRef(false)
     const startAfterLoad = shallowRef(false)
 
-    const { duration, waiting, play, skipTo, skipBy, retry: reload } = useMedia(videoRef, props, {
+    const { duration, buffered, waiting, play, seek, retry: reload } = useMedia(videoRef, props, {
       playing,
       progress,
       volume,
@@ -173,7 +175,7 @@ export const VVideo = genericComponent<VVideoSlots>()({
     }
 
     function onKeydown (e: KeyboardEvent) {
-      if (!videoRef.value || e.ctrlKey) return
+      if (!videoRef.value || e.ctrlKey || e.defaultPrevented) return
       if (e.key.startsWith('Arrow')) {
         e.preventDefault()
       }
@@ -186,17 +188,17 @@ export const VVideo = genericComponent<VVideoSlots>()({
           break
         }
         case e.key === 'ArrowRight': {
-          skipBy(10 * (e.shiftKey ? 6 : 1))
+          seek({ by: 10 * (e.shiftKey ? 6 : 1) })
           // TODO: show skip indicator
           break
         }
         case e.key === 'ArrowLeft': {
-          skipBy(-10 * (e.shiftKey ? 6 : 1))
+          seek({ by: -10 * (e.shiftKey ? 6 : 1) })
           // TODO: show skip indicator
           break
         }
         case createRange(10).map(String).includes(e.key): {
-          skipTo(Number(e.key) * 10)
+          seek({ to: `${Number(e.key) * 10}%` })
           break
         }
         case e.key === 'ArrowUp': {
@@ -238,8 +240,7 @@ export const VVideo = genericComponent<VVideoSlots>()({
 
     function focusSlider () {
       const container = videoRef.value?.closest('.v-video') as HTMLElement
-      const innerSlider = container?.querySelector('[role="slider"]') as HTMLElement
-      innerSlider?.focus()
+      container?.querySelector<HTMLElement>('.v-media-progress-bar')?.focus()
     }
 
     function fullscreenExitShortcut (e: KeyboardEvent) {
@@ -318,15 +319,15 @@ export const VVideo = genericComponent<VVideoSlots>()({
         playing: playing.value,
         progress: progress.value,
         duration: duration.value,
+        buffer: props.showBuffer ? buffered.value : 0,
         volume: volume.value,
         ...props.controlsProps,
       }
 
       const controlsEventHandlers = {
-        onSkip: (v: number) => skipTo(v),
         'onClick:fullscreen': () => toggleFullscreen(),
         'onUpdate:playing': (v: boolean) => playing.value = v,
-        'onUpdate:progress': (v: number) => skipTo(v),
+        'onUpdate:progress': (v: number) => seek({ to: `${v}%` }),
         'onUpdate:volume': (v: number) => volume.value = v,
         onClick: (e: Event) => e.stopPropagation(),
       }
@@ -465,7 +466,7 @@ export const VVideo = genericComponent<VVideoSlots>()({
             </MaybeTransition>
             { activeOverlays.loading && (
               <div key="loading-overlay" class="v-video__overlay-fill">
-                { loadingIndicator }
+                { slots.loader?.({ color: props.color, isActive: true }) ?? loadingIndicator }
               </div>
             )}
             { activeOverlays.error && (
@@ -507,7 +508,7 @@ export const VVideo = genericComponent<VVideoSlots>()({
       video: videoRef,
       ...forwardRefs({
         retry,
-        skipTo,
+        seek,
         toggleFullscreen,
       }, controlsRef),
     }

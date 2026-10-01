@@ -6,8 +6,8 @@ import { VDefaultsProvider } from '@/components/VDefaultsProvider'
 import { VSpacer } from '@/components/VGrid'
 import { VIconBtn } from '@/components/VIconBtn/VIconBtn'
 import { VLocaleProvider } from '@/components/VLocaleProvider'
+import { makeVMediaProgressBarProps, VMediaProgressBar } from '@/labs/VMediaProgressBar/VMediaProgressBar'
 import { VMediaVolume } from '@/labs/VMediaVolume/VMediaVolume'
-import { makeVSeekBarProps, VSeekBar } from '@/labs/VSeekBar/VSeekBar'
 
 // Composables
 import { useTextColor } from '@/composables/color'
@@ -16,7 +16,7 @@ import { injectNestedDefaults } from '@/composables/defaults'
 import { useLocale } from '@/composables/locale'
 import { useProxiedModel } from '@/composables/proxiedModel'
 import { makeThemeProps, provideTheme } from '@/composables/theme'
-import { useMute } from '@/labs/composables/media'
+import { resolveSeekTarget, useMute } from '@/labs/composables/media'
 
 // Utilities
 import { computed, Fragment, toRef } from 'vue'
@@ -26,6 +26,7 @@ import { clamp, formatTime, genericComponent, pick, propsFactory, useRender } fr
 import type { PropType } from 'vue'
 import type { VSlider } from '@/components/VSlider'
 import type { ClassValue } from '@/composables/component'
+import type { MediaSeekTarget } from '@/labs/composables/media'
 import type { VMediaVolumeOptions } from '@/labs/VMediaVolume/VMediaVolume'
 
 export type VAudioAction = 'play' | 'progress' | 'time' | 'volume' | '-' | (string & {})
@@ -41,8 +42,7 @@ export type VAudioControlsActionsSlot = {
   play: () => void
   pause: () => void
   stop: () => void
-  skipTo: (percent: number) => void
-  skipBy: (seconds: number) => void
+  seek: (target: MediaSeekTarget) => void
   playing: boolean
   progress: number
   currentTime: VAudioControlsTimeSlot
@@ -114,7 +114,7 @@ export const makeVAudioControlsProps = propsFactory({
 
   color: String,
 
-  ...pick(makeVSeekBarProps(), ['buffer', 'chapters', 'thumb', 'tooltip']),
+  ...pick(makeVMediaProgressBarProps(), ['buffer', 'chapters', 'thumb', 'tooltip']),
   ...makeComponentProps(),
   ...makeThemeProps(),
 }, 'VAudioControls')
@@ -201,15 +201,11 @@ export const VAudioControls = genericComponent<VAudioControlsSlots>()({
       emit('click:stop')
     }
 
-    function skipTo (percent: number) {
-      const next = clamp(percent, 0, 100)
-      emit('update:progress', next)
-    }
-
-    function skipBy (seconds: number) {
+    function seek (target: MediaSeekTarget) {
       if (!props.duration) return
 
-      skipTo(progress.value + seconds / props.duration * 100)
+      const seconds = resolveSeekTarget(target, elapsedSeconds.value, props.duration)
+      if (Number.isFinite(seconds)) emit('update:progress', clamp(seconds / props.duration * 100, 0, 100))
     }
 
     function setPlaybackRate (value: number) {
@@ -220,8 +216,7 @@ export const VAudioControls = genericComponent<VAudioControlsSlots>()({
       play,
       pause,
       stop,
-      skipTo,
-      skipBy,
+      seek,
       playing: playing.value,
       progress: progress.value,
       currentTime: currentTime.value,
@@ -242,7 +237,7 @@ export const VAudioControls = genericComponent<VAudioControlsSlots>()({
         },
       }
 
-      const seekProps: Record<string, unknown> = {
+      const progressBarProps: Record<string, unknown> = {
         modelValue: elapsedSeconds.value,
         max: props.duration,
         buffer: props.buffer,
@@ -252,12 +247,12 @@ export const VAudioControls = genericComponent<VAudioControlsSlots>()({
         color: props.color,
         disabled: !props.duration,
         readonly: !props.seekable,
-        'onUpdate:modelValue': (seconds: number) => skipTo(seconds / props.duration * 100),
+        'onUpdate:modelValue': (seconds: number) => seek({ to: seconds }),
         onStart: () => emit('scrubStart'),
         onEnd: () => emit('scrubEnd'),
       }
 
-      const seek = slots.progress?.({ ...slotProps.value, props: seekProps }) ?? <VSeekBar { ...seekProps } />
+      const progressBar = slots.progress?.({ ...slotProps.value, props: progressBarProps }) ?? <VMediaProgressBar { ...progressBarProps } />
 
       const actions = typeof props.actions === 'string'
         ? props.actions.split(/[\s,]+/).filter(Boolean)
@@ -272,7 +267,7 @@ export const VAudioControls = genericComponent<VAudioControlsSlots>()({
             </div>
           )}
 
-          <div class="v-audio-controls__seek">{ seek }</div>
+          <div class="v-audio-controls__seek">{ progressBar }</div>
 
           { !isProgressInlined && !props.hideTime && !slots.time && (
             <div key="total" class="v-audio-controls__time">
