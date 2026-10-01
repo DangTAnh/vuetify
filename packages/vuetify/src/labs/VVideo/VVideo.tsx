@@ -23,7 +23,8 @@ import { makeThemeProps, provideTheme } from '@/composables/theme'
 import { MaybeTransition } from '@/composables/transition'
 
 // Utilities
-import { nextTick, onBeforeUnmount, onMounted, ref, shallowRef, toRef, Transition, watch } from 'vue'
+import { onBeforeUnmount, onMounted, shallowRef, toRef, Transition, watch } from 'vue'
+import { useMedia } from '@/labs/VAudio/media'
 import { createRange, genericComponent, omit, pick, propsFactory, useRender } from '@/util'
 
 // Types
@@ -113,48 +114,37 @@ export const VVideo = genericComponent<VVideoSlots>()({
     const { roundedClasses: roundedContainerClasses, roundedStyles: roundedContainerStyles } = useRounded(roundedForContainer)
     const { roundedClasses: roundedControlsClasses, roundedStyles: roundedControlsStyles } = useRounded(roundedForControls)
 
-    const containerRef = ref<HTMLDivElement>()
-    const videoRef = ref<HTMLVideoElement>()
-    const controlsRef = ref<VVideoControls>()
+    const containerRef = shallowRef<HTMLDivElement>()
+    const videoRef = shallowRef<HTMLVideoElement>()
+    const controlsRef = shallowRef<VVideoControls>()
 
     const playing = useProxiedModel(props, 'playing')
     const progress = useProxiedModel(props, 'progress')
     const volume = useProxiedModel(props, 'volume', 0, (v?: number | string) => Number(v ?? 0))
+    const error = useProxiedModel(props, 'error')
 
     const fullscreen = shallowRef(false)
-    const waiting = shallowRef(false)
     const triggered = shallowRef(false)
+    const loaded = shallowRef(false)
     const startAfterLoad = shallowRef(false)
-    const error = useProxiedModel(props, 'error')
-    const state = shallowRef<'idle' | 'loading' | 'loaded' | 'error'>(props.autoplay ? 'loading' : 'idle')
-    const duration = shallowRef(0)
+
+    const { duration, waiting, play, skipTo, skipBy, retry: reload } = useMedia(videoRef, props, {
+      playing,
+      progress,
+      volume,
+      error,
+      onError: value => emit('error', value),
+    })
+
+    const state = toRef(() => error.value ? 'error'
+      : loaded.value ? 'loaded'
+      : triggered.value || props.autoplay ? 'loading'
+      : 'idle')
 
     const fullscreenEnabled = toRef(() => !props.noFullscreen && !String(attrs.controlsList ?? '').includes('nofullscreen'))
 
-    function onTimeupdate () {
-      const { currentTime, duration } = videoRef.value!
-      progress.value = duration === 0 ? 0 : 100 * currentTime / duration
-    }
-
-    async function onTriggered () {
-      await nextTick()
-      if (!videoRef.value) return
-      videoRef.value.addEventListener('timeupdate', onTimeupdate)
-      videoRef.value.volume = volume.value / 100
-      if (state.value !== 'loaded') {
-        state.value = 'loading'
-      }
-    }
-
-    function onVideoLoaded () {
-      state.value = 'loaded'
-      duration.value = videoRef.value!.duration
-
-      const startTime = Number(props.startAt ?? 0)
-      if (startTime && startTime <= duration.value) {
-        videoRef.value!.currentTime = startTime
-        progress.value = duration.value === 0 ? 0 : 100 * startTime / duration.value
-      }
+    function onLoadeddata () {
+      loaded.value = true
 
       if (startAfterLoad.value) {
         setTimeout(() => playing.value = true, 100)
@@ -163,28 +153,15 @@ export const VVideo = genericComponent<VVideoSlots>()({
       emit('loaded', videoRef.value!)
     }
 
-    function onVideoError (e: Event) {
-      state.value = 'error'
-      error.value = videoRef.value!.error as MediaError
-    }
-
-    watch(error, v => {
-      if (v && state.value !== 'error') {
-        videoRef.value?.pause()
-        state.value = 'error'
-      }
-    }, { immediate: true })
-
     function retry () {
       if (state.value !== 'error') return
 
-      error.value = false
-      state.value = 'loading'
+      loaded.value = false
       triggered.value = true
 
-      videoRef.value?.load()
+      reload()
       if (!props.srcObject) {
-        videoRef.value?.play()
+        play()
       }
     }
 
@@ -209,14 +186,12 @@ export const VVideo = genericComponent<VVideoSlots>()({
           break
         }
         case e.key === 'ArrowRight': {
-          const step = 10 * (e.shiftKey ? 6 : 1)
-          videoRef.value.currentTime = Math.min(videoRef.value.currentTime + step, duration.value)
+          skipBy(10 * (e.shiftKey ? 6 : 1))
           // TODO: show skip indicator
           break
         }
         case e.key === 'ArrowLeft': {
-          const step = 10 * (e.shiftKey ? 6 : 1)
-          videoRef.value.currentTime = Math.max(videoRef.value.currentTime - step, 0)
+          skipBy(-10 * (e.shiftKey ? 6 : 1))
           // TODO: show skip indicator
           break
         }
@@ -245,41 +220,7 @@ export const VVideo = genericComponent<VVideoSlots>()({
       }
     }
 
-    function skipTo (v: number) {
-      if (!videoRef.value) return
-      progress.value = v
-      videoRef.value.currentTime = duration.value * v / 100
-    }
-
-    watch(() => props.src, v => {
-      progress.value = 0
-    })
-
-    watch(() => props.srcObject, async v => {
-      if (v) triggered.value = true
-      await nextTick()
-      if (videoRef.value) videoRef.value.srcObject = v ?? null
-    })
-
-    watch(videoRef, v => {
-      if (v && props.srcObject) v.srcObject = props.srcObject
-    })
-
-    watch(playing, v => {
-      if (!videoRef.value) return
-      if (v) {
-        videoRef.value.play()
-      } else {
-        videoRef.value.pause()
-      }
-    })
-
-    watch(volume, v => {
-      if (!videoRef.value) return
-      videoRef.value.volume = v / 100
-    })
-
-    watch(triggered, () => onTriggered(), { once: true })
+    watch(() => props.srcObject, v => v && (triggered.value = true))
 
     watch(() => props.eager, v => v && (triggered.value = true), { immediate: true })
 
@@ -291,7 +232,6 @@ export const VVideo = genericComponent<VVideoSlots>()({
     })
 
     onBeforeUnmount(() => {
-      videoRef.value?.removeEventListener('timeupdate', onTimeupdate)
       document.body.removeEventListener('keydown', fullscreenExitShortcut)
       document.removeEventListener('fullscreenchange', onFullscreenExit)
     })
@@ -484,12 +424,7 @@ export const VVideo = genericComponent<VVideoSlots>()({
                 muted={ props.muted }
                 playsinline
                 ref={ videoRef }
-                onLoadeddata={ onVideoLoaded }
-                onError={ onVideoError }
-                onPlay={ () => playing.value = true }
-                onPause={ () => playing.value = false }
-                onWaiting={ () => waiting.value = true }
-                onPlaying={ () => waiting.value = false }
+                onLoadeddata={ onLoadeddata }
                 onClick={ onVideoClick }
                 onDblclick={ onDoubleClick }
                 onTouchend={ onTouchend }

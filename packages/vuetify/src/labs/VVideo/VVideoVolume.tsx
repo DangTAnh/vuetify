@@ -17,6 +17,7 @@ import vTooltip from '@/directives/tooltip'
 
 // Utilities
 import { ref, shallowRef, toRef } from 'vue'
+import { getVolumeIcon } from '@/labs/VAudio/media'
 import { EventProp, genericComponent, propsFactory, useRender } from '@/util'
 
 // Types
@@ -55,10 +56,7 @@ export const VVideoVolume = genericComponent()({
     const { t } = useLocale()
     const volume = useProxiedModel(props, 'modelValue')
 
-    const volumeIcon = toRef(() => volume.value > 70 ? '$volumeHigh'
-      : volume.value > 40 ? '$volumeMedium'
-      : volume.value > 10 ? '$volumeLow'
-      : '$volumeOff')
+    const volumeIcon = toRef(() => getVolumeIcon(volume.value))
 
     const containerRef = ref<HTMLElement>()
     const menu = shallowRef(false)

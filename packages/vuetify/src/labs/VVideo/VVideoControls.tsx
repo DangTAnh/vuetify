@@ -22,7 +22,8 @@ import { makeThemeProps, provideTheme } from '@/composables/theme'
 import vTooltip from '@/directives/tooltip'
 
 // Utilities
-import { computed, shallowRef, toRef } from 'vue'
+import { computed, toRef } from 'vue'
+import { useMute } from '@/labs/VAudio/media'
 import { formatTime, genericComponent, propsFactory, useRender } from '@/util'
 
 // Types
@@ -123,7 +124,7 @@ export const VVideoControls = genericComponent<VVideoControlsSlots>()({
     const playing = useProxiedModel(props, 'playing')
     const progress = useProxiedModel(props, 'progress')
     const volume = useProxiedModel(props, 'volume', 0, (v?: number | string) => Number(v ?? 0))
-    const lastVolume = shallowRef<number>()
+    const { toggleMuted } = useMute(volume)
 
     const currentTime = computed(() => {
       const secondsElapsed = Math.round(props.progress / 100 * props.duration)
@@ -157,15 +158,6 @@ export const VVideoControls = genericComponent<VVideoControlsSlots>()({
 
     function skipTo (v: number) {
       progress.value = v
-    }
-
-    function toggleMuted () {
-      if (volume.value) {
-        lastVolume.value = volume.value
-        volume.value = 0
-      } else {
-        volume.value = lastVolume.value ?? 100
-      }
     }
 
     function toggleFullscreen () {

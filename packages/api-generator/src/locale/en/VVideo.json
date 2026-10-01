@@ -23,7 +23,7 @@
     "update:playing": "Emitted when playing state changes.",
     "update:progress": "Emitted when the internal playback progress changes.",
     "update:volume": "Emitted when the volume changes.",
-    "error": "Emits `true` when the video fails to load or `false` when user triggered retry."
+    "error": "Emitted with the native MediaError when the video fails to load."
   },
   "slots": {
     "header": "Slot for additional content placed on top of the video.",
